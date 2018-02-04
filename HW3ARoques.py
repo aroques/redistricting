@@ -18,10 +18,8 @@ import time
 
 start_time = time.time()
 
-NUM_RUNS = 50000000
-
 def main():
-
+    num_runs = 0
     redistricting_stats = {}
     voter_parties = get_voter_parties()
     district_scheme = get_district_scheme()
@@ -38,7 +36,9 @@ def main():
         num_contiguous = 1
     
     # Now loop
-    for i in range(NUM_RUNS):
+    while num_contiguous < 31:
+    #for i in range(2000):
+        num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
         start_coords = get_start_coords(district_scheme)
@@ -57,17 +57,21 @@ def main():
             num_contiguous += 1
             update_redistricting_stats(redistricting_stats, district_stats)
         
-        if i % 10000000 == 0 and i != 0:
-            print("10,000,000 runs")
+        if num_contiguous % 5 == 0:
+            print("Number of contiguous districts found: {}\n".format(num_contiguous))
+            print('Time ran: {:.2} minutes\n'.format((time.time() - start_time) / 60))
+            print("Number of runs: {:,}\n".format(num_runs))
             
-    print_redistricting_stats(redistricting_stats, num_contiguous)
+    print_redistricting_stats(redistricting_stats, num_contiguous, num_runs)
 
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
     d_stats = {key: {'G': 0, 'P': 0} for key in range(1, 6)}
+    print(d_stats)
     for i, district in enumerate(district_scheme):
         for j, district_num in enumerate(district):
             party = voter_parties[i][j]
+            print("district_num = {}; party = {}".format(district_num, party))
             d_stats[district_num][party] += 1
     return d_stats
 
@@ -88,9 +92,11 @@ def update_redistricting_stats(redistricting_stats, district_stats):
     else:
         redistricting_stats[key] += 1
 
-def print_redistricting_stats(redistricting_stats, num_contiguous):
+def print_redistricting_stats(redistricting_stats, num_contiguous, num_runs):
+    """ Prints redistricting stats and writes stats to a file """ 
     out = '\nTotal time ran: {:.2} minutes\n'.format((time.time() - start_time) / 60)
-    out += 'Number of runs: {}\n\n'.format(NUM_RUNS)
+    out += 'Number of runs: {:,}\n'.format(num_runs)
+    out += 'Number of contiguous redistrictings found: {}\n\n'.format(num_contiguous)
     out += '{:>50}'.format('----- Redistrict Win Ratio Stats -----\n')
     out += '{:<15} {:<15} {:<15} {:<15}\n'.format('Winner', 'Green wins', 'Purple wins', 'Pct times occured')
     for k, v in redistricting_stats.items():
@@ -99,8 +105,10 @@ def print_redistricting_stats(redistricting_stats, num_contiguous):
         else:
             winner = 'Purple'
         out += '{:<15} {:<15} {:<15} {:<15.2%}\n'.format(winner, k[0], k[1], v/num_contiguous)
+        outfile = 'HW3output.txt'
+        out += '\nOutput file: {}\n'.format(outfile)
     print(out)
-    with open('HW3output.txt', 'w') as f:
+    with open(outfile, 'w') as f:
         f.write(out)
 
 def get_voter_parties():
