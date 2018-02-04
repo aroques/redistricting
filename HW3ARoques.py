@@ -11,7 +11,10 @@ Purpose/Description:  25 voters (15 green and 10 purple party) are ramdomly spre
     program is done running (i.e, which party won in what ratio). Ex. Green Won - 3, 2 and what percent of the 
     total did each party win. Ex. Green Won 95% of the time.
 External files: HW3output.txt (the text-file that the results of the program are written to)
-Sources: python3 documentation
+Sources: python3 documentation, https://py.checkio.org/mission/count-neighbours/, 
+    http://www.imageprocessingplace.com/downloads_V3/root_downloads/tutorials/contour_tracing_Abeer_George_Ghuneim/ray.html,
+    https://github.com/a1ip/checkio-1/blob/master/the%20Moore%20neighborhood.py
+
 
 '''
 
