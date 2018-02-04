@@ -18,40 +18,26 @@ import time
 
 start_time = time.time()
 
-NUM_RUNS = 1
+NUM_RUNS = 50000000
 
 def main():
 
+    redistricting_stats = {}
     voter_parties = get_voter_parties()
     district_scheme = get_district_scheme()
     district_coordinates = get_district_coordinates()
 
-    # test
+    # Test run
     start_coord = (0,0)
     neighbors = []
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
-        print("this district is contiguous")
-        stats = {}
-        for i, district in enumerate(district_scheme):
-            for j, voter_district in enumerate(district):
-                if voter_district not in stats:
-                    stats[voter_district] = District()
-                    stats[voter_district].add_party(voter_parties[i][j])
-                else:
-                    stats[voter_district].add_party(voter_parties[i][j])
-        
-        for k, v in stats.items():
-            if v.green_count > v.purple_count:
-                winner = 'green'
-            else:
-                winner = 'purple'
-            print("District {}: Winner {} - {} green, {} purple".format(k, winner, v.green_count, v.purple_count))
-                
-
+        print("Found a contiguous district!")
+        district_stats = get_district_stats(district_scheme, voter_parties)
+        update_redistricting_stats(redistricting_stats, district_stats)
+        num_contiguous = 1
     
-    num_contiguous = 1
-
+    # Now loop
     for i in range(NUM_RUNS):
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
@@ -66,25 +52,56 @@ def main():
                 break
         
         if redistricting_is_contiguous:
-            print("this district is contiguous")
-            for i, district in enumerate(district_scheme):
-                for j, voter_district in enumerate(district):
-                    print("voter district: {}, voter party: {}".format(voter_district, voter_parties[i][j]))
-
+            print("Found a contiguous district!")
+            district_stats = get_district_stats(district_scheme, voter_parties)
             num_contiguous += 1
-    
-    print("num_contiguous is {}".format(num_contiguous))
+            update_redistricting_stats(redistricting_stats, district_stats)
+        
+        if i % 10000000 == 0 and i != 0:
+            print("10,000,000 runs")
+            
+    print_redistricting_stats(redistricting_stats, num_contiguous)
 
-class District:
-    def __init__(self):
-        self.green_count = 0
-        self.purple_count = 0 
-    
-    def add_party(self, p):
-        if p == 'G':
-            self.green_count += 1
-        elif p == 'P':
-            self.purple_count += 1
+def get_district_stats(district_scheme, voter_parties):
+    """ Returns statistics of how many of each party each district contains """
+    d_stats = {key: {'G': 0, 'P': 0} for key in range(1, 6)}
+    for i, district in enumerate(district_scheme):
+        for j, district_num in enumerate(district):
+            party = voter_parties[i][j]
+            d_stats[district_num][party] += 1
+    return d_stats
+
+def update_redistricting_stats(redistricting_stats, district_stats):
+    """ Uses districts_stats to update redistricting_stats """
+    g_cnt = p_cnt = 0
+
+    for k, v in district_stats.items():
+        if v['G'] > v['P']:
+            g_cnt += 1
+        else:
+            p_cnt += 1
+
+    key = (g_cnt, p_cnt)
+
+    if key not in redistricting_stats:
+        redistricting_stats[key] = 1
+    else:
+        redistricting_stats[key] += 1
+
+def print_redistricting_stats(redistricting_stats, num_contiguous):
+    out = '\nTotal time ran: {:.2} minutes\n'.format((time.time() - start_time) / 60)
+    out += 'Number of runs: {}\n\n'.format(NUM_RUNS)
+    out += '{:>50}'.format('----- Redistrict Win Ratio Stats -----\n')
+    out += '{:<15} {:<15} {:<15} {:<15}\n'.format('Winner', 'Green wins', 'Purple wins', 'Pct times occured')
+    for k, v in redistricting_stats.items():
+        if k[0] > k[1]:
+            winner = 'Green'
+        else:
+            winner = 'Purple'
+        out += '{:<15} {:<15} {:<15} {:<15.2%}\n'.format(winner, k[0], k[1], v/num_contiguous)
+    print(out)
+    with open('HW3output.txt', 'w') as f:
+        f.write(out)
 
 def get_voter_parties():
     """ Returns map of voter parties """
