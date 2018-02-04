@@ -36,7 +36,7 @@ def main():
         num_contiguous = 1
     
     # Now loop
-    while num_contiguous < 31:
+    while num_contiguous < 51:
     #for i in range(2000):
         num_runs += 1
         shuffle(district_coordinates)
@@ -144,7 +144,6 @@ def has_five_neighbours(neighbors, grid, coord):
         return True
 
     shifts = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
-    print(coord)
     x = coord[0]
     y = coord[1]
 
@@ -166,7 +165,6 @@ def has_five_neighbours(neighbors, grid, coord):
                 # We found a neighbor!
                 neighbors.append(neighbor)
                 found_neighbor = True
-                print(neighbor)
                 return has_five_neighbours(neighbors, grid, neighbor)
     
     if not found_neighbor:
@@ -178,7 +176,6 @@ def get_start_coords(district_scheme):
     for i in range(1, 6):
         start_coord = get_start_coord(district_scheme, i)
         start_coords.append(start_coord)
-    print(start_coords)
     return start_coords
 
 def get_start_coord(district_scheme, district_num):
