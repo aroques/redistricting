@@ -36,7 +36,7 @@ def main():
         num_contiguous = 1
     
     # Now loop
-    while num_contiguous < 51:
+    while num_contiguous < 30:
     #for i in range(2000):
         num_runs += 1
         shuffle(district_coordinates)
@@ -57,9 +57,11 @@ def main():
             num_contiguous += 1
             update_redistricting_stats(redistricting_stats, district_stats)
         
-        if num_contiguous % 5 == 0:
+
+        if num_runs % 10000000 == 0 and num_runs != 0:
             print("Number of contiguous districts found: {}\n".format(num_contiguous))
-            print('Time ran: {:.2} minutes\n'.format((time.time() - start_time) / 60))
+            hours = (time.time() - start_time) / 60 / 60
+            print('Time ran: {:.2} hours\n'.format(hours))
             print("Number of runs: {:,}\n".format(num_runs))
             
     print_redistricting_stats(redistricting_stats, num_contiguous, num_runs)
@@ -92,7 +94,7 @@ def update_redistricting_stats(redistricting_stats, district_stats):
 
 def print_redistricting_stats(redistricting_stats, num_contiguous, num_runs):
     """ Prints redistricting stats and writes stats to a file """ 
-    out = '\nTotal time ran: {:.2} minutes\n'.format((time.time() - start_time) / 60)
+    out = '\nTotal time ran: {:.2} hours\n'.format((time.time() - start_time) / 60 / 60)
     out += 'Number of runs: {:,}\n'.format(num_runs)
     out += 'Number of contiguous redistrictings found: {}\n\n'.format(num_contiguous)
     out += '{:>50}'.format('----- Redistrict Win Ratio Stats -----\n')
