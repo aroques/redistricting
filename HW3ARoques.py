@@ -1,13 +1,16 @@
 '''
 
 Name: Alec Roques
-Date: 02/03/2018
+Date: 02/04/2018
 Course: 4500 - Intro to the Software Profession (T/TH @ 12:30p)
 Version: 1
 Purpose/Description:  25 voters (15 green and 10 purple party) are ramdomly spread across 5 districts 
     with 5 voters in each district. Which party wins each district? Which party wins each redistricting?
-    This program provides simulates 1,000,000 redistrictings and prints the statistics.
-External files: HW3output.txt (the text-file that the results of the 1,000,000 redistrictings are written to)
+    This program provides randomly generates redistrictings, checks if the random redistricting is contiguous 
+    and if it is will log statistics of the contiguous redistricting. Final statistics will be printed when the 
+    program is done running (i.e, which party won (in what ratio). Ex. Green Won - 3, 2 and what percent of the 
+    total did each party win. Ex. Green Won 95% of the time.
+External files: HW3output.txt (the text-file that the results of the program are written to)
 Sources: python3 documentation
 
 '''
