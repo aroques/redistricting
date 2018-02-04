@@ -18,11 +18,11 @@ import time
 
 start_time = time.time()
 
-NUM_RUNS = 100000000
+NUM_RUNS = 1
 
 def main():
 
-    voter_map = get_voter_map()
+    voter_parties = get_voter_parties()
     district_scheme = get_district_scheme()
     district_coordinates = get_district_coordinates()
 
@@ -31,7 +31,24 @@ def main():
     neighbors = []
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
-        print("contiguous!")
+        print("this district is contiguous")
+        stats = {}
+        for i, district in enumerate(district_scheme):
+            for j, voter_district in enumerate(district):
+                if voter_district not in stats:
+                    stats[voter_district] = District()
+                    stats[voter_district].add_party(voter_parties[i][j])
+                else:
+                    stats[voter_district].add_party(voter_parties[i][j])
+        
+        for k, v in stats.items():
+            if v.green_count > v.purple_count:
+                winner = 'green'
+            else:
+                winner = 'purple'
+            print("District {}: Winner {} - {} green, {} purple".format(k, winner, v.green_count, v.purple_count))
+                
+
     
     num_contiguous = 1
 
@@ -50,12 +67,27 @@ def main():
         
         if redistricting_is_contiguous:
             print("this district is contiguous")
+            for i, district in enumerate(district_scheme):
+                for j, voter_district in enumerate(district):
+                    print("voter district: {}, voter party: {}".format(voter_district, voter_parties[i][j]))
+
             num_contiguous += 1
     
     print("num_contiguous is {}".format(num_contiguous))
 
-def get_voter_map():
-    """ Returns map of voters """
+class District:
+    def __init__(self):
+        self.green_count = 0
+        self.purple_count = 0 
+    
+    def add_party(self, p):
+        if p == 'G':
+            self.green_count += 1
+        elif p == 'P':
+            self.purple_count += 1
+
+def get_voter_parties():
+    """ Returns map of voter parties """
     return [['P', 'G', 'G', 'G', 'G'],
             ['G', 'P', 'P', 'P', 'G'],  
             ['G', 'P', 'G', 'G', 'G'], 
