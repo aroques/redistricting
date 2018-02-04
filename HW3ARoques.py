@@ -67,11 +67,9 @@ def main():
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
     d_stats = {key: {'G': 0, 'P': 0} for key in range(1, 6)}
-    print(d_stats)
     for i, district in enumerate(district_scheme):
         for j, district_num in enumerate(district):
             party = voter_parties[i][j]
-            print("district_num = {}; party = {}".format(district_num, party))
             d_stats[district_num][party] += 1
     return d_stats
 
@@ -133,20 +131,20 @@ def get_district_coordinates():
 
 def populate_district_scheme(district_scheme, coordinates):
     """ Populates district_scheme with districts using coordinates """
-    district = -1
+    district = 1
     for i, coord in enumerate(coordinates):
-        if (i % 5) == 0:
+        if (i != 0) and (i % 5) == 0:
             district += 1
     
         district_scheme[coord[0]][coord[1]] = district
-
+    print(district_scheme)
 def has_five_neighbours(neighbors, grid, coord):
     """ Returns true if start coord is in a partition (of values equal to itself) of size 5 """
     if len(neighbors) == 5:
         return True
 
     shifts = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
-
+    print(coord)
     x = coord[0]
     y = coord[1]
 
@@ -168,6 +166,7 @@ def has_five_neighbours(neighbors, grid, coord):
                 # We found a neighbor!
                 neighbors.append(neighbor)
                 found_neighbor = True
+                print(neighbor)
                 return has_five_neighbours(neighbors, grid, neighbor)
     
     if not found_neighbor:
@@ -176,9 +175,10 @@ def has_five_neighbours(neighbors, grid, coord):
 def get_start_coords(district_scheme):
     """ Returns a list that contains a coordinate from each district """ 
     start_coords = []
-    for i in range(5):
+    for i in range(1, 6):
         start_coord = get_start_coord(district_scheme, i)
         start_coords.append(start_coord)
+    print(start_coords)
     return start_coords
 
 def get_start_coord(district_scheme, district_num):
