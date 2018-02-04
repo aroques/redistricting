@@ -137,7 +137,7 @@ def populate_district_scheme(district_scheme, coordinates):
             district += 1
     
         district_scheme[coord[0]][coord[1]] = district
-    print(district_scheme)
+
 def has_five_neighbours(neighbors, grid, coord):
     """ Returns true if start coord is in a partition (of values equal to itself) of size 5 """
     if len(neighbors) == 5:
