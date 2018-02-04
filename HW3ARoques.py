@@ -8,7 +8,7 @@ Purpose/Description:  25 voters (15 green and 10 purple party) are ramdomly spre
     with 5 voters in each district. Which party wins each district? Which party wins each redistricting?
     This program provides randomly generates redistrictings, checks if the random redistricting is contiguous 
     and if it is will log statistics of the contiguous redistricting. Final statistics will be printed when the 
-    program is done running (i.e, which party won (in what ratio). Ex. Green Won - 3, 2 and what percent of the 
+    program is done running (i.e, which party won in what ratio). Ex. Green Won - 3, 2 and what percent of the 
     total did each party win. Ex. Green Won 95% of the time.
 External files: HW3output.txt (the text-file that the results of the program are written to)
 Sources: python3 documentation
