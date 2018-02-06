@@ -112,7 +112,7 @@ def print_redistricting_stats(redistricting_stats, num_contiguous, num_runs):
             winner = 'Purple'
         out += '{:<15} {:<15} {:<15} {:<15.2%}\n'.format(winner, k[0], k[1], v/num_contiguous)
         outfile = 'HW3output.txt'
-        out += '\nOutput file: {}\n'.format(outfile)
+    out += '\nOutput file: {}\n'.format(outfile)
     print(out)
     with open(outfile, 'w') as f:
         f.write(out)
