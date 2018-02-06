@@ -10,6 +10,8 @@ Purpose/Description:  25 voters (15 green and 10 purple party) are ramdomly spre
     and if it is will log statistics of the contiguous redistricting. Final statistics will be printed when the 
     program is done running (i.e, which party won in what ratio). Ex. Green Won - 3, 2 and what percent of the 
     total did each party win. Ex. Green Won 95% of the time.
+
+    30 contiguous districts took around 16 hours (1 billion runs).
 External files: HW3output.txt (the text-file that the results of the program are written to)
 Sources: python3 documentation, https://py.checkio.org/mission/count-neighbours/, 
     http://www.imageprocessingplace.com/downloads_V3/root_downloads/tutorials/contour_tracing_Abeer_George_Ghuneim/ray.html,
@@ -25,6 +27,7 @@ import time
 start_time = time.time()
 
 def main():
+    out = '{:>48}'.format('------- District Schemes -------\n') # Final output that is written to text file
     num_runs = 0
     redistricting_stats = {}
     voter_parties = get_voter_parties()
@@ -37,13 +40,14 @@ def main():
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
         print("Found a contiguous district!")
+        out += print_district_scheme(district_scheme, voter_parties)
         district_stats = get_district_stats(district_scheme, voter_parties)
         update_redistricting_stats(redistricting_stats, district_stats)
         num_contiguous = 1
-    
+
     # Now loop
-    while num_contiguous < 30:
-    #for i in range(2000):
+    #while num_contiguous < 30:
+    for i in range(1000000):
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
@@ -62,7 +66,7 @@ def main():
             district_stats = get_district_stats(district_scheme, voter_parties)
             num_contiguous += 1
             update_redistricting_stats(redistricting_stats, district_stats)
-        
+            out += print_district_scheme(district_scheme, voter_parties)
 
         if num_runs % 10000000 == 0 and num_runs != 0:
             print("Number of contiguous districts found: {}\n".format(num_contiguous))
@@ -70,7 +74,7 @@ def main():
             print('Time ran: {:.2} hours\n'.format(hours))
             print("Number of runs: {:,}\n".format(num_runs))
             
-    print_redistricting_stats(redistricting_stats, num_contiguous, num_runs)
+    print_redistricting_stats(out, redistricting_stats, num_contiguous, num_runs)
 
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
@@ -98,12 +102,15 @@ def update_redistricting_stats(redistricting_stats, district_stats):
     else:
         redistricting_stats[key] += 1
 
-def print_redistricting_stats(redistricting_stats, num_contiguous, num_runs):
+def print_redistricting_stats(out, redistricting_stats, num_contiguous, num_runs):
     """ Prints redistricting stats and writes stats to a file """ 
-    out = '\nTotal time ran: {:.2} hours\n'.format((time.time() - start_time) / 60 / 60)
+    out += '\n'
+    out += '{:>48}'.format('---------- General Stats ----------\n')
+    out += 'Total time ran: {:.2} hours\n'.format((time.time() - start_time) / 60 / 60)
     out += 'Number of runs: {:,}\n'.format(num_runs)
     out += 'Number of contiguous redistrictings found: {}\n\n'.format(num_contiguous)
-    out += '{:>50}'.format('----- Redistrict Win Ratio Stats -----\n')
+    out += '\n'
+    out += '{:>50}'.format('------ Redistrict Win Ratio Stats ------\n')
     out += '{:<15} {:<15} {:<15} {:<15}\n'.format('Winner', 'Green wins', 'Purple wins', 'Pct times occured')
     for k, v in redistricting_stats.items():
         if k[0] > k[1]:
@@ -132,6 +139,29 @@ def get_district_scheme():
             [3, 1, 1, 2, 4], 
             [3, 3, 1, 2, 4],
             [3, 3, 4, 4, 4]]
+
+def print_district_scheme(grid, voters):
+    """ Prints a textual display of the district scheme (grid) """
+    
+    out = ''
+
+    WIDTH = 27
+
+    for i in range(WIDTH):
+        out += '='
+    out += '\n'
+    for i, row in enumerate(grid):
+        out += '|'
+        for j, col in enumerate(row):
+            out += ' {}.{} '.format(col, voters[i][j])
+        out += '|\n'
+
+    for i in range(WIDTH):
+        out += '='
+    out += '\n'
+
+    return out
+    
 
 def get_district_coordinates():
     """ Returns a list of district coordinates (tuples) """
