@@ -25,9 +25,11 @@ from itertools import product
 import time
 
 start_time = time.time()
+TITLE_WIDTH = 70
 
 def main():
-    out = '{:>48}'.format('------- District Schemes -------\n') # Final output that is written to text file
+    district_scheme_visualization = '{}'.format(' District Schemes '.center(TITLE_WIDTH, '-'))
+    district_scheme_visualization += '\n'
     num_runs = 0
     redistricting_stats = {}
     voter_parties = get_voter_parties()
@@ -40,7 +42,7 @@ def main():
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
         print("Found a contiguous district!")
-        out += print_district_scheme(district_scheme, voter_parties)
+        district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
         district_stats = get_district_stats(district_scheme, voter_parties)
         update_redistricting_stats(redistricting_stats, district_stats)
         num_contiguous = 1
@@ -55,7 +57,6 @@ def main():
         redistricting_is_contiguous = True
         
         for start_coord in start_coords:
-            print("start coord: {}".format(start_coord))
             neighbors = []
             neighbors.append(start_coord)
             if not has_five_neighbours(neighbors, district_scheme, start_coord):
@@ -67,7 +68,7 @@ def main():
             district_stats = get_district_stats(district_scheme, voter_parties)
             num_contiguous += 1
             update_redistricting_stats(redistricting_stats, district_stats)
-            out += print_district_scheme(district_scheme, voter_parties)
+            district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
 
         if num_runs % 10000000 == 0 and num_runs != 0:
             print("Number of contiguous districts found: {}\n".format(num_contiguous))
@@ -75,7 +76,7 @@ def main():
             print('Time ran: {:.2} hours\n'.format(hours))
             print("Number of runs: {:,}\n".format(num_runs))
             
-    print_redistricting_stats(out, redistricting_stats, num_contiguous, num_runs)
+    print_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
 
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
@@ -103,15 +104,17 @@ def update_redistricting_stats(redistricting_stats, district_stats):
     else:
         redistricting_stats[key] += 1
 
-def print_redistricting_stats(out, redistricting_stats, num_contiguous, num_runs):
+def print_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs):
     """ Prints redistricting stats and writes stats to a file """ 
-    out += '\n'
-    out += '{:>48}'.format('---------- General Stats ----------\n')
+    out = '\n\n'
+    out += '{}'.format(' General Stats '.center(TITLE_WIDTH, '-'))
+    out += '\n\n'
     out += 'Total time ran: {:.2} hours\n'.format((time.time() - start_time) / 60 / 60)
     out += 'Number of runs: {:,}\n'.format(num_runs)
-    out += 'Number of contiguous redistrictings found: {}\n\n'.format(num_contiguous)
-    out += '\n'
-    out += '{:>50}'.format('------ Redistrict Win Ratio Stats ------\n')
+    out += 'Number of contiguous redistrictings found: {}\n'.format(num_contiguous)
+    out += '\n\n'
+    out += '{}'.format(' Redistrict Win Ratio Stats '.center(TITLE_WIDTH, '-'))
+    out += '\n\n'
     out += '{:<15} {:<15} {:<15} {:<15}\n'.format('Winner', 'Green wins', 'Purple wins', 'Pct times occured')
     for k, v in redistricting_stats.items():
         if k[0] > k[1]:
@@ -119,8 +122,9 @@ def print_redistricting_stats(out, redistricting_stats, num_contiguous, num_runs
         else:
             winner = 'Purple'
         out += '{:<15} {:<15} {:<15} {:<15.2%}\n'.format(winner, k[0], k[1], v/num_contiguous)
-        outfile = 'HW3output.txt'
-    out += '\nOutput file: {}\n'.format(outfile)
+    outfile = 'HW3output.txt'
+    out += '\n\n'
+    out += district_scheme_visualization
     print(out)
     with open(outfile, 'w') as f:
         f.write(out)
@@ -141,9 +145,8 @@ def get_district_scheme():
             [3, 3, 1, 2, 4],
             [3, 3, 4, 4, 4]]
 
-def print_district_scheme(grid, voters):
-    """ Prints a textual display of the district scheme (grid) """
-    
+def get_district_scheme_visualization(grid, voters):
+    """ Returns a textual visualization of the district scheme (grid) """ 
     out = ''
 
     WIDTH = 27
