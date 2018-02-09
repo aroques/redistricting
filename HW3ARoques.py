@@ -47,14 +47,15 @@ def main():
 
     # Now loop
     #while num_contiguous < 30:
-    for i in range(1000000):
+    for i in range(100000):
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
-        start_coords = get_start_coords(district_scheme)
+        start_coords = get_start_coords(district_coordinates)
         redistricting_is_contiguous = True
         
         for start_coord in start_coords:
+            print("start coord: {}".format(start_coord))
             neighbors = []
             neighbors.append(start_coord)
             if not has_five_neighbours(neighbors, district_scheme, start_coord):
@@ -208,20 +209,15 @@ def has_five_neighbours(neighbors, grid, coord):
     if not found_neighbor:
         return False
 
-def get_start_coords(district_scheme):
+def get_start_coords(coordinates):
     """ Returns a list that contains a coordinate from each district """ 
-    start_coords = []
-    for i in range(1, 6):
-        start_coord = get_start_coord(district_scheme, i)
-        start_coords.append(start_coord)
-    return start_coords
-
-def get_start_coord(district_scheme, district_num):
-    """ Returns the first coordinate from district_scheme that has a value of district_num """
-    for i, district in enumerate(district_scheme):
-        for j, voter in enumerate(district):
-            if voter == district_num:
-                return (i, j)
+    return [
+        coordinates[0],
+        coordinates[5],
+        coordinates[10],
+        coordinates[15],
+        coordinates[20]
+    ]
 
 if __name__ == '__main__':
     main()
