@@ -55,7 +55,7 @@ def main():
     contiguous_grids.append(get_another_district_scheme())
 
     #Now loop
-    #while num_contiguous < 5:
+    #while num_contiguous < 3:
     for i in range(10000):
         num_runs += 1
         shuffle(district_coordinates)
@@ -153,6 +153,9 @@ def update_redistricting_stats(redistricting_stats, district_stats):
         redistricting_stats[key] = 1
     else:
         redistricting_stats[key] += 1
+
+def build_ratio_stats():
+    pass
 
 def write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs):
     """ Writes redistricting stats to a file """ 
