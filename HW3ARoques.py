@@ -47,7 +47,7 @@ def main():
     neighbors = []
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
-        print("Found a contiguous district!")
+        print("Found a contiguous redistricting!")
         district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
         district_stats = get_district_stats(district_scheme, voter_parties)
         update_redistricting_stats(redistricting_stats, district_stats)
@@ -56,8 +56,8 @@ def main():
     contiguous_grids.append(get_another_district_scheme())
 
     #Now loop
-    #while num_contiguous < 2:
-    for _ in range(2): 
+    while num_contiguous < 2:
+    #for _ in range(2): 
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
@@ -67,6 +67,7 @@ def main():
         for j, start_coord in enumerate(start_coords):
 
             if j == 4:
+                print('Found a redistricting with 4/5 contiguous districs!')
                 for row in district_scheme:
                     print(row)
 
@@ -77,7 +78,7 @@ def main():
                 break
         
         if redistricting_is_contiguous:
-            print("Found a contiguous district!")
+            print("Found a contiguous redistricting!")
             district_stats = get_district_stats(district_scheme, voter_parties)
             num_contiguous += 1
             update_redistricting_stats(redistricting_stats, district_stats)
@@ -92,10 +93,11 @@ def main():
     paint_results(contiguous_grids, ratio_stats)
 
 def print_update(num_runs, num_contiguous):
-    print("Number of contiguous districts found: {}\n".format(num_contiguous))
+    print("Number of contiguous districts found: {}".format(num_contiguous))
     hours = (time.time() - start_time) / 60 / 60
-    print('Time ran: {:.2} hours\n'.format(hours))
-    print("Number of runs: {:,}\n".format(num_runs))
+    print('Time ran: {:.2} hours'.format(hours))
+    print("Number of runs: {:,}".format(num_runs))
+    print()
 
 def populate_district_scheme(district_scheme, coordinates):
     """ Populates district_scheme with districts using coordinates """
