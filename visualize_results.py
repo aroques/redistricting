@@ -30,7 +30,6 @@ class Redistricting_Visualization():
             self.show_pie()
         else:
             self.hide_pie()
-        print("show pie clicked!")
 
     def show_pie(self):
         self.btn_next.configure(state=DISABLED)
@@ -156,11 +155,11 @@ class Pie_Chart:
     def __init__(self, root, canvas, ratio_stats):
         self.board = Board()
         self.arc_ids = []
-        self.labels_ids = []
+        self.label_ids = []
 
-        x0, y0, x1, y1 = 100, 20, (self.board.width/6)*5, (self.board.height/6)*5
+        x0, y0, x1, y1 = 100, 20, (self.board.width/8)*7, (self.board.height/4)*3
         coords = [x0, y0, x1, y1]
-        color_list = ['limegreen', 'red', 'dodgerblue', 'yellow', 'orange']
+        color_list = ['limegreen', 'green', 'yellowgreen', 'olive', 'palegreen']
 
         start_degree = 0
 
@@ -171,18 +170,43 @@ class Pie_Chart:
         ratio_stats[(2, 3)] = .0333
 
         i = 0
+
+        x = 20
+        y_start = (self.board.height/20)*16
+        new_line = 22
+
+        width = 15
+
+        label_text = '{:<{width}} {:<{width}} {:<{width}} {:<{width}}'.format('Winner', 'Ratio', 'Percent', 'Color', width=width)
+        self.label_ids.append(canvas.create_text(x, y_start, text=label_text, font="times 12 bold", anchor='w'))
+
         for k, v in ratio_stats.items():
             green_wins = k[0]
             purple_wins = k[1]
-            
+
             color = color_list[i]
+
+            if green_wins > purple_wins:
+                winner = 'Green'
+            else:
+                winner = 'Purple'
+                color = 'magenta'
+                i -= 1
+            
+
             pct = v
             extent = self.prop(pct)
 
-            self.arc_ids.append(canvas.create_arc(*coords, fill=color, outline=color, start=start_degree, extent=extent))
-            #self.label_ids.append(canvas.create_text(x0 + col_width/2  + self.board.offset, y0 + row_height/2 + self.board.offset, text=str(district), font="times 20 bold"))
+            self.arc_ids.append(canvas.create_arc(*coords, fill=color, outline='black', start=start_degree, extent=extent))
+            ratio = 'G: {} P: {}'.format(green_wins, purple_wins)
+            pct = round(float(pct*100), 2)
+            pct = str(pct).zfill(5) + '%'
+            label_text = '{:<{width}} {:<{width}}  {:<{width}} {:<{width}}'.format(winner, ratio, pct, color, width=width)
+            self.label_ids.append(canvas.create_text(x, (y_start + new_line), text=label_text, font="times 12", anchor='w'))
             
             start_degree += extent
+            y_start += new_line
+
             i += 1
 
     def prop(self, pct): 
@@ -190,11 +214,11 @@ class Pie_Chart:
 
     def show_pie(self, canvas):
         Canvas_Helper.hide_canvas_items(False, canvas, self.arc_ids)
-        #Canvas_Helper.hide_canvas_items(False, canvas, self.district_label_ids)
+        Canvas_Helper.hide_canvas_items(False, canvas, self.label_ids)
 
     def hide_pie(self, canvas):
         Canvas_Helper.hide_canvas_items(True, canvas, self.arc_ids)
-        #Canvas_Helper.hide_canvas_items(True, canvas, self.district_label_ids)
+        Canvas_Helper.hide_canvas_items(True, canvas, self.label_ids)
 
 class Board:
     def __init__(self):

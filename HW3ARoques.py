@@ -43,6 +43,7 @@ def main():
 
     # Test run
     start_coord = (0, 1)
+
     neighbors = []
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
@@ -55,15 +56,20 @@ def main():
     contiguous_grids.append(get_another_district_scheme())
 
     #Now loop
-    #while num_contiguous < 3:
-    for i in range(10000000):
+    #while num_contiguous < 2:
+    for _ in range(2): 
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
         start_coords = get_start_coords(district_coordinates)
         redistricting_is_contiguous = True
         
-        for start_coord in start_coords:
+        for j, start_coord in enumerate(start_coords):
+
+            if j == 4:
+                for row in district_scheme:
+                    print(row)
+
             neighbors = []
             neighbors.append(start_coord)
             if not has_five_neighbours(neighbors, district_scheme, start_coord):
