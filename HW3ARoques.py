@@ -21,6 +21,7 @@ Sources: python3 documentation, https://py.checkio.org/mission/count-neighbours/
 '''
 
 from random import shuffle
+from display_results import paint_results
 from itertools import product
 import time
 
@@ -33,6 +34,9 @@ def main():
     num_runs = 0
     redistricting_stats = {}
     voter_parties = get_voter_parties()
+    contiguous_grids = []
+
+
     district_scheme = get_district_scheme()
     district_coordinates = get_district_coordinates()
 
@@ -49,7 +53,7 @@ def main():
 
     # Now loop
     #while num_contiguous < 30:
-    for i in range(100000):
+    for i in range(10000):
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
@@ -76,7 +80,8 @@ def main():
             print('Time ran: {:.2} hours\n'.format(hours))
             print("Number of runs: {:,}\n".format(num_runs))
             
-    print_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
+    write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
+    paint_results(district_scheme)
 
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
@@ -104,8 +109,8 @@ def update_redistricting_stats(redistricting_stats, district_stats):
     else:
         redistricting_stats[key] += 1
 
-def print_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs):
-    """ Prints redistricting stats and writes stats to a file """ 
+def write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs):
+    """ Writes redistricting stats to a file """ 
     out = '\n\n'
     out += '{}'.format(' General Stats '.center(TITLE_WIDTH, '-'))
     out += '\n\n'
@@ -125,7 +130,6 @@ def print_redistricting_stats(district_scheme_visualization, redistricting_stats
     outfile = 'HW3output.txt'
     out += '\n\n'
     out += district_scheme_visualization
-    print(out)
     with open(outfile, 'w') as f:
         f.write(out)
 

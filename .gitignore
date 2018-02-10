@@ -1,2 +1,4 @@
 .vscode
 HW3output.txt
+__pycache__
+data.txt
