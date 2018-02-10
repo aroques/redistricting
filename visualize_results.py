@@ -159,15 +159,15 @@ class Pie_Chart:
 
         x0, y0, x1, y1 = 100, 20, (self.board.width/8)*7, (self.board.height/4)*3
         coords = [x0, y0, x1, y1]
-        color_list = ['limegreen', 'green', 'yellowgreen', 'olive', 'palegreen']
+        green_list = ['limegreen', 'green', 'yellowgreen', 'olive', 'palegreen']
 
         start_degree = 0
 
         # test data
-        ratio_stats[(4, 1)] = .4333
-        ratio_stats[(3, 2)] = .4667
-        ratio_stats[(5, 0)] = .0667
-        ratio_stats[(2, 3)] = .0333
+        # ratio_stats[(4, 1)] = .4333
+        # ratio_stats[(3, 2)] = .4667
+        # ratio_stats[(5, 0)] = .0667
+        # ratio_stats[(2, 3)] = .0333
 
         i = 0
 
@@ -184,14 +184,14 @@ class Pie_Chart:
             green_wins = k[0]
             purple_wins = k[1]
 
-            color = color_list[i]
+            color = green_list[i]
 
             if green_wins > purple_wins:
                 winner = 'Green'
+                i += 1
             else:
                 winner = 'Purple'
                 color = 'magenta'
-                i -= 1
             
 
             pct = v
@@ -207,7 +207,7 @@ class Pie_Chart:
             start_degree += extent
             y_start += new_line
 
-            i += 1
+            
 
     def prop(self, pct): 
         return 359.99 * pct
