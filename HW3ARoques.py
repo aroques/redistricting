@@ -47,41 +47,45 @@ def main():
     if has_five_neighbours(neighbors, district_scheme, start_coord):
         print("Found a contiguous district!")
         district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
+        contiguous_grids.append(district_scheme)
         district_stats = get_district_stats(district_scheme, voter_parties)
         update_redistricting_stats(redistricting_stats, district_stats)
         num_contiguous = 1
 
-    # Now loop
-    #while num_contiguous < 30:
-    for i in range(10000):
-        num_runs += 1
-        shuffle(district_coordinates)
-        populate_district_scheme(district_scheme, district_coordinates)
-        start_coords = get_start_coords(district_coordinates)
-        redistricting_is_contiguous = True
-        
-        for start_coord in start_coords:
-            neighbors = []
-            neighbors.append(start_coord)
-            if not has_five_neighbours(neighbors, district_scheme, start_coord):
-                redistricting_is_contiguous = False
-                break
-        
-        if redistricting_is_contiguous:
-            print("Found a contiguous district!")
-            district_stats = get_district_stats(district_scheme, voter_parties)
-            num_contiguous += 1
-            update_redistricting_stats(redistricting_stats, district_stats)
-            district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
+    contiguous_grids.append(get_another_district_scheme())
 
-        if num_runs % 10000000 == 0 and num_runs != 0:
-            print("Number of contiguous districts found: {}\n".format(num_contiguous))
-            hours = (time.time() - start_time) / 60 / 60
-            print('Time ran: {:.2} hours\n'.format(hours))
-            print("Number of runs: {:,}\n".format(num_runs))
+    # Now loop
+    # while num_contiguous < 2:
+    # #for i in range(10000):
+    #     num_runs += 1
+    #     shuffle(district_coordinates)
+    #     populate_district_scheme(district_scheme, district_coordinates)
+    #     start_coords = get_start_coords(district_coordinates)
+    #     redistricting_is_contiguous = True
+        
+    #     for start_coord in start_coords:
+    #         neighbors = []
+    #         neighbors.append(start_coord)
+    #         if not has_five_neighbours(neighbors, district_scheme, start_coord):
+    #             redistricting_is_contiguous = False
+    #             break
+        
+    #     if redistricting_is_contiguous:
+    #         print("Found a contiguous district!")
+    #         district_stats = get_district_stats(district_scheme, voter_parties)
+    #         num_contiguous += 1
+    #         update_redistricting_stats(redistricting_stats, district_stats)
+    #         district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
+    #         contiguous_grids.append(district_scheme)
+
+    #     if num_runs % 10000000 == 0 and num_runs != 0:
+    #         print("Number of contiguous districts found: {}\n".format(num_contiguous))
+    #         hours = (time.time() - start_time) / 60 / 60
+    #         print('Time ran: {:.2} hours\n'.format(hours))
+    #         print("Number of runs: {:,}\n".format(num_runs))
             
     write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
-    paint_results(district_scheme)
+    paint_results(contiguous_grids)
 
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
@@ -148,6 +152,14 @@ def get_district_scheme():
             [3, 1, 1, 2, 4], 
             [3, 3, 1, 2, 4],
             [3, 3, 4, 4, 4]]
+
+def get_another_district_scheme():
+    """ Returns contiguous district scheme """
+    return [[4, 1, 1, 3, 3],
+            [5, 4, 1, 1, 3],  
+            [5, 4, 4, 1, 3], 
+            [5, 4, 2, 3, 2],
+            [5, 5, 2, 2, 2]]
 
 def get_district_scheme_visualization(grid, voters):
     """ Returns a textual visualization of the district scheme (grid) """ 
