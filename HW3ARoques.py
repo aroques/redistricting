@@ -1,7 +1,7 @@
 '''
 
 Name: Alec Roques
-Date: 02/04/2018
+Date: 02/09/2018
 Course: 4500 - Intro to the Software Profession (T/TH @ 12:30p)
 Version: 1
 Purpose/Description:  25 voters (15 green and 10 purple party) are ramdomly spread across 5 districts 
@@ -21,9 +21,10 @@ Sources: python3 documentation, https://py.checkio.org/mission/count-neighbours/
 '''
 
 from random import shuffle
-from display_results import paint_results
-from itertools import product
+from visualize_results import paint_results
 import time
+from copy import deepcopy
+from getters import *
 
 start_time = time.time()
 TITLE_WIDTH = 70
@@ -36,8 +37,8 @@ def main():
     voter_parties = get_voter_parties()
     contiguous_grids = []
 
-
     district_scheme = get_district_scheme()
+    contiguous_grids.append(deepcopy(district_scheme))
     district_coordinates = get_district_coordinates()
 
     # Test run
@@ -47,45 +48,85 @@ def main():
     if has_five_neighbours(neighbors, district_scheme, start_coord):
         print("Found a contiguous district!")
         district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
-        contiguous_grids.append(district_scheme)
         district_stats = get_district_stats(district_scheme, voter_parties)
         update_redistricting_stats(redistricting_stats, district_stats)
-        num_contiguous = 1
+        num_contiguous = 2
 
     contiguous_grids.append(get_another_district_scheme())
 
-    # Now loop
-    # while num_contiguous < 2:
-    # #for i in range(10000):
-    #     num_runs += 1
-    #     shuffle(district_coordinates)
-    #     populate_district_scheme(district_scheme, district_coordinates)
-    #     start_coords = get_start_coords(district_coordinates)
-    #     redistricting_is_contiguous = True
+    #Now loop
+    #while num_contiguous < 5:
+    for i in range(10000):
+        num_runs += 1
+        shuffle(district_coordinates)
+        populate_district_scheme(district_scheme, district_coordinates)
+        start_coords = get_start_coords(district_coordinates)
+        redistricting_is_contiguous = True
         
-    #     for start_coord in start_coords:
-    #         neighbors = []
-    #         neighbors.append(start_coord)
-    #         if not has_five_neighbours(neighbors, district_scheme, start_coord):
-    #             redistricting_is_contiguous = False
-    #             break
+        for start_coord in start_coords:
+            neighbors = []
+            neighbors.append(start_coord)
+            if not has_five_neighbours(neighbors, district_scheme, start_coord):
+                redistricting_is_contiguous = False
+                break
         
-    #     if redistricting_is_contiguous:
-    #         print("Found a contiguous district!")
-    #         district_stats = get_district_stats(district_scheme, voter_parties)
-    #         num_contiguous += 1
-    #         update_redistricting_stats(redistricting_stats, district_stats)
-    #         district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
-    #         contiguous_grids.append(district_scheme)
+        if redistricting_is_contiguous:
+            print("Found a contiguous district!")
+            district_stats = get_district_stats(district_scheme, voter_parties)
+            num_contiguous += 1
+            update_redistricting_stats(redistricting_stats, district_stats)
+            district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
+            contiguous_grids.append(deepcopy(district_scheme))
 
-    #     if num_runs % 10000000 == 0 and num_runs != 0:
-    #         print("Number of contiguous districts found: {}\n".format(num_contiguous))
-    #         hours = (time.time() - start_time) / 60 / 60
-    #         print('Time ran: {:.2} hours\n'.format(hours))
-    #         print("Number of runs: {:,}\n".format(num_runs))
+        if num_runs % 10000000 == 0 and num_runs != 0:
+            print("Number of contiguous districts found: {}\n".format(num_contiguous))
+            hours = (time.time() - start_time) / 60 / 60
+            print('Time ran: {:.2} hours\n'.format(hours))
+            print("Number of runs: {:,}\n".format(num_runs))
             
     write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
     paint_results(contiguous_grids)
+
+def populate_district_scheme(district_scheme, coordinates):
+    """ Populates district_scheme with districts using coordinates """
+    district = 1
+    for i, coord in enumerate(coordinates):
+        if (i != 0) and (i % 5) == 0:
+            district += 1
+    
+        district_scheme[coord[0]][coord[1]] = district
+
+def has_five_neighbours(neighbors, grid, coord):
+    """ Returns true if start coord is in a partition (of values equal to itself) of size 5 """
+    if len(neighbors) == 5:
+        return True
+
+    shifts = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+    x = coord[0]
+    y = coord[1]
+
+    this_val = grid[x][y]
+
+    found_neighbor = False
+    
+    # Loop through adjacent coordinates
+    for shift in shifts:
+        n_row = x + shift[0]
+        n_col = y + shift[1]
+
+        if (n_row < len(grid[0]) and n_row >= 0) and (n_col < len(grid) and n_col >= 0): # Bounds Check
+            adjacent_val = grid[n_row][n_col]
+            
+            neighbor = (n_row, n_col)
+            
+            if (this_val == adjacent_val) and (neighbor not in neighbors):
+                # We found a neighbor!
+                neighbors.append(neighbor)
+                found_neighbor = True
+                return has_five_neighbours(neighbors, grid, neighbor)
+    
+    if not found_neighbor:
+        return False
 
 def get_district_stats(district_scheme, voter_parties):
     """ Returns statistics of how many of each party each district contains """
@@ -137,30 +178,6 @@ def write_redistricting_stats(district_scheme_visualization, redistricting_stats
     with open(outfile, 'w') as f:
         f.write(out)
 
-def get_voter_parties():
-    """ Returns map of voter parties """
-    return [['P', 'G', 'G', 'G', 'G'],
-            ['G', 'P', 'P', 'P', 'G'],  
-            ['G', 'P', 'G', 'G', 'G'], 
-            ['G', 'G', 'G', 'P', 'P'],
-            ['P', 'G', 'P', 'G', 'P']]
-
-def get_district_scheme():
-    """ Returns contiguous district scheme """
-    return [[1, 5, 5, 5, 2],
-            [1, 5, 5, 2, 2],  
-            [3, 1, 1, 2, 4], 
-            [3, 3, 1, 2, 4],
-            [3, 3, 4, 4, 4]]
-
-def get_another_district_scheme():
-    """ Returns contiguous district scheme """
-    return [[4, 1, 1, 3, 3],
-            [5, 4, 1, 1, 3],  
-            [5, 4, 4, 1, 3], 
-            [5, 4, 2, 3, 2],
-            [5, 5, 2, 2, 2]]
-
 def get_district_scheme_visualization(grid, voters):
     """ Returns a textual visualization of the district scheme (grid) """ 
     out = ''
@@ -181,62 +198,6 @@ def get_district_scheme_visualization(grid, voters):
     out += '\n'
 
     return out
-    
-
-def get_district_coordinates():
-    """ Returns a list of district coordinates (tuples) """
-    return list(product(range(5), repeat=2))
-
-def populate_district_scheme(district_scheme, coordinates):
-    """ Populates district_scheme with districts using coordinates """
-    district = 1
-    for i, coord in enumerate(coordinates):
-        if (i != 0) and (i % 5) == 0:
-            district += 1
-    
-        district_scheme[coord[0]][coord[1]] = district
-
-def has_five_neighbours(neighbors, grid, coord):
-    """ Returns true if start coord is in a partition (of values equal to itself) of size 5 """
-    if len(neighbors) == 5:
-        return True
-
-    shifts = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
-    x = coord[0]
-    y = coord[1]
-
-    this_val = grid[x][y]
-
-    found_neighbor = False
-    
-    # Loop through adjacent coordinates
-    for shift in shifts:
-        n_row = x + shift[0]
-        n_col = y + shift[1]
-
-        if (n_row < len(grid[0]) and n_row >= 0) and (n_col < len(grid) and n_col >= 0): # Bounds Check
-            adjacent_val = grid[n_row][n_col]
-            
-            neighbor = (n_row, n_col)
-            
-            if (this_val == adjacent_val) and (neighbor not in neighbors):
-                # We found a neighbor!
-                neighbors.append(neighbor)
-                found_neighbor = True
-                return has_five_neighbours(neighbors, grid, neighbor)
-    
-    if not found_neighbor:
-        return False
-
-def get_start_coords(coordinates):
-    """ Returns a list that contains a coordinate from each district """ 
-    return [
-        coordinates[0],
-        coordinates[5],
-        coordinates[10],
-        coordinates[15],
-        coordinates[20]
-    ]
 
 if __name__ == '__main__':
     main()
