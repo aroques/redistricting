@@ -3,14 +3,14 @@ from tkinter import ttk
 from random import choice
 from getters import get_voter_parties
 
-def paint_results(grids):
+def paint_results(grids, ratio_stats):
 
-    rv = Redistricting_Visualization(grids)
+    rv = Redistricting_Visualization(grids, ratio_stats)
 
     rv.visualize()
 
 class Redistricting_Visualization():
-    def __init__(self, grids):
+    def __init__(self, grids, ratio_stats):
         self.board = Board()
         self.root = self.get_root()
         self.canvas = Canvas(self.root, width=self.board.window_width, height=self.board.window_height, borderwidth=5, background='white')
@@ -18,31 +18,50 @@ class Redistricting_Visualization():
         self.add_buttons()
 
         self.color_by_party = False
-        
+        self.pie_is_hidden = False
+
         self.grid = Grid(grids)
         self.grid.create_rectangles(self.canvas, self.color_by_party)
         self.grid.hide_grid(self.canvas)
-        self.grid.show_grid(self.canvas)
-        #pie = Pie_Chart(self.root, self.canvas)
-
-        #self.create_rectangles(self.color_by_party)
+        self.pie = Pie_Chart(self.root, self.canvas, ratio_stats)
 
     def btn_show_pie_clicked(self):
+        if self.pie_is_hidden:
+            self.show_pie()
+        else:
+            self.hide_pie()
         print("show pie clicked!")
+
+    def show_pie(self):
+        self.btn_next.configure(state=DISABLED)
+        self.btn_prev.configure(state=DISABLED)
+        self.btn_show_pie.configure(text="Hide pie chart")
+        self.btn_color_by.configure(state=DISABLED)
+        self.pie.show_pie(self.canvas)
+        self.grid.hide_grid(self.canvas)
+        self.pie_is_hidden = False
+
+    def hide_pie(self):
+        self.enable_disable_next_prev_btns()
+        self.btn_show_pie.configure(text="Show pie chart")
+        self.btn_color_by.configure(state=NORMAL)
+        self.pie.hide_pie(self.canvas)
+        self.grid.show_grid(self.canvas)
+        self.pie_is_hidden = True
 
     def btn_next_clicked(self):
         self.grid.grid_num += 1
         self.color_by_party = False
         self.btn_color_by.configure(text='Color by Party')
         self.grid.create_rectangles(self.canvas, self.color_by_party)
-        self.enable_disable_buttons()
+        self.enable_disable_next_prev_btns()
 
     def btn_previous_clicked(self):
         self.grid.grid_num -= 1
         self.color_by_party = False
         self.btn_color_by.configure(text='Color by Party')
         self.grid.create_rectangles(self.canvas, self.color_by_party)
-        self.enable_disable_buttons()
+        self.enable_disable_next_prev_btns()
 
     def btn_color_by_clicked(self):
         if not self.color_by_party:
@@ -54,8 +73,7 @@ class Redistricting_Visualization():
             self.btn_color_by.configure(text='Color by Party')
             self.grid.create_rectangles(self.canvas, self.color_by_party)
 
-
-    def enable_disable_buttons(self):
+    def enable_disable_next_prev_btns(self):
         if self.grid.grid_num == len(self.grid.grids)-1:
             self.btn_next.config(state=DISABLED)
         else:
@@ -74,20 +92,19 @@ class Redistricting_Visualization():
         return root
             
     def add_buttons(self):
-        self.btn_show_pie = Button(self.root, text="Show pie chart", command=self.btn_show_pie_clicked)
+        self.btn_show_pie = Button(self.root, text="Hide pie chart", command=self.btn_show_pie_clicked)
         self.btn_show_pie.grid(row=5, column=0, columnspan=6, sticky=W+E)
-        self.btn_color_by = Button(self.root, text="Color by Party", command=self.btn_color_by_clicked)
+        self.btn_color_by = Button(self.root, text="Color by Party", command=self.btn_color_by_clicked, state=DISABLED)
         self.btn_color_by.grid(row=6, column=0, columnspan=6, sticky=W+E)
         self.btn_prev = Button(self.root, text="Previous", command=self.btn_previous_clicked, state=DISABLED)
         self.btn_prev.grid(row=7, column=2, sticky=W+E)
-        self.btn_next = Button(self.root, text="Next", command=self.btn_next_clicked)
+        self.btn_next = Button(self.root, text="Next", command=self.btn_next_clicked, state=DISABLED)
         self.btn_next.grid(row=7, column=3, sticky=W+E)
 
     def visualize(self):
         self.root.mainloop()
 
 class Grid:
-
     def __init__(self, grids):
         self.grids = grids
         self.grid_num = 0
@@ -128,36 +145,42 @@ class Grid:
         return color
 
     def show_grid(self, canvas):
-        self.hide_canvas_items(False, canvas, self.rectangle_ids)
-        self.hide_canvas_items(False, canvas, self.district_label_ids)
+        Canvas_Helper.hide_canvas_items(False, canvas, self.rectangle_ids)
+        Canvas_Helper.hide_canvas_items(False, canvas, self.district_label_ids)
 
     def hide_grid(self, canvas):
-        self.hide_canvas_items(True, canvas, self.rectangle_ids)
-        self.hide_canvas_items(True, canvas, self.district_label_ids)
-
-    def hide_canvas_items(self, hide, canvas, items):
-        if hide:
-            state = HIDDEN
-        else:
-            state = NORMAL
-
-        for item in items:
-            canvas.itemconfigure(item, state=state)
-
+        Canvas_Helper.hide_canvas_items(True, canvas, self.rectangle_ids)
+        Canvas_Helper.hide_canvas_items(True, canvas, self.district_label_ids)
 
 class Pie_Chart:
-    def __init__(self, root, canvas):
+    def __init__(self, root, canvas, ratio_stats):
         self.board = Board()
+        self.arc_ids = []
+
         x0, y0, x1, y1 = 100, 100, (self.board.width/6)*5, (self.board.height/6)*5
         coords = [x0, y0, x1, y1]
-        canvas.create_arc(*coords, fill="#FAF402", outline="#FAF402", start=self.prop(0), extent = self.prop(20))
-        canvas.create_arc(*coords, fill="#00AC36", outline="#00AC36", start=self.prop(20), extent = self.prop(40))
-        canvas.create_arc(*coords, fill="#7A0871", outline="#7A0871", start=self.prop(60), extent = self.prop(5))
-        canvas.create_arc(*coords, fill="#E00022", outline="#E00022", start=self.prop(65), extent = self.prop(20))
-        canvas.create_arc(*coords, fill="#294994", outline="#294994",  start=self.prop(85), extent = self.prop(15))
+        color_list = ['limegreen', 'red', 'dodgerblue', 'yellow', 'orange']
+
+        start_degree = 0
+
+        for k, v in ratio_stats.items():
+            green_wins = k[0]
+            purple_wins = k[1]
+            pct = v
+            color = choice(color_list)
+            self.arc_ids.append(canvas.create_arc(*coords, fill=color, outline=color, start=self.prop(start_degree), extent=self.prop(pct)))
+            start_degree = pct
 
     def prop(self, pct): 
-        return 360.0 * (pct/100)
+        return 359.99 * pct
+
+    def show_pie(self, canvas):
+        Canvas_Helper.hide_canvas_items(False, canvas, self.arc_ids)
+        #Canvas_Helper.hide_canvas_items(False, canvas, self.district_label_ids)
+
+    def hide_pie(self, canvas):
+        Canvas_Helper.hide_canvas_items(True, canvas, self.arc_ids)
+        #Canvas_Helper.hide_canvas_items(True, canvas, self.district_label_ids)
 
 class Board:
     def __init__(self):
@@ -171,3 +194,14 @@ class Board:
     @property
     def window_height(self):
         return self.height + self.offset
+
+class Canvas_Helper:
+    @staticmethod
+    def hide_canvas_items(hide, canvas, items):
+        if hide:
+            state = HIDDEN
+        else:
+            state = NORMAL
+
+        for item in items:
+            canvas.itemconfigure(item, state=state)

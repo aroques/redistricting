@@ -50,7 +50,7 @@ def main():
         district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
         district_stats = get_district_stats(district_scheme, voter_parties)
         update_redistricting_stats(redistricting_stats, district_stats)
-        num_contiguous = 2
+        num_contiguous = 1
 
     contiguous_grids.append(get_another_district_scheme())
 
@@ -85,7 +85,8 @@ def main():
             print("Number of runs: {:,}\n".format(num_runs))
             
     write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
-    paint_results(contiguous_grids)
+    ratio_stats = get_ratio_stats(redistricting_stats, num_contiguous)
+    paint_results(contiguous_grids, ratio_stats)
 
 def populate_district_scheme(district_scheme, coordinates):
     """ Populates district_scheme with districts using coordinates """
@@ -154,8 +155,14 @@ def update_redistricting_stats(redistricting_stats, district_stats):
     else:
         redistricting_stats[key] += 1
 
-def build_ratio_stats():
-    pass
+def get_ratio_stats(redistricting_stats, num_contiguous):
+    ratio = {}
+
+    for k, v in redistricting_stats.items():
+        key = (k[0], k[1])
+        ratio[key] = v/num_contiguous
+    
+    return ratio
 
 def write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs):
     """ Writes redistricting stats to a file """ 
