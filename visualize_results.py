@@ -156,20 +156,34 @@ class Pie_Chart:
     def __init__(self, root, canvas, ratio_stats):
         self.board = Board()
         self.arc_ids = []
+        self.labels_ids = []
 
-        x0, y0, x1, y1 = 100, 100, (self.board.width/6)*5, (self.board.height/6)*5
+        x0, y0, x1, y1 = 100, 20, (self.board.width/6)*5, (self.board.height/6)*5
         coords = [x0, y0, x1, y1]
         color_list = ['limegreen', 'red', 'dodgerblue', 'yellow', 'orange']
 
         start_degree = 0
 
+        # test data
+        ratio_stats[(4, 1)] = .4333
+        ratio_stats[(3, 2)] = .4667
+        ratio_stats[(5, 0)] = .0667
+        ratio_stats[(2, 3)] = .0333
+
+        i = 0
         for k, v in ratio_stats.items():
             green_wins = k[0]
             purple_wins = k[1]
+            
+            color = color_list[i]
             pct = v
-            color = choice(color_list)
-            self.arc_ids.append(canvas.create_arc(*coords, fill=color, outline=color, start=self.prop(start_degree), extent=self.prop(pct)))
-            start_degree = pct
+            extent = self.prop(pct)
+
+            self.arc_ids.append(canvas.create_arc(*coords, fill=color, outline=color, start=start_degree, extent=extent))
+            #self.label_ids.append(canvas.create_text(x0 + col_width/2  + self.board.offset, y0 + row_height/2 + self.board.offset, text=str(district), font="times 20 bold"))
+            
+            start_degree += extent
+            i += 1
 
     def prop(self, pct): 
         return 359.99 * pct

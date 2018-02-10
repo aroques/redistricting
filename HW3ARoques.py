@@ -42,7 +42,7 @@ def main():
     district_coordinates = get_district_coordinates()
 
     # Test run
-    start_coord = (0,0)
+    start_coord = (0, 1)
     neighbors = []
     neighbors.append(start_coord)
     if has_five_neighbours(neighbors, district_scheme, start_coord):
@@ -56,7 +56,7 @@ def main():
 
     #Now loop
     #while num_contiguous < 3:
-    for i in range(10000):
+    for i in range(10000000):
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
@@ -79,14 +79,17 @@ def main():
             contiguous_grids.append(deepcopy(district_scheme))
 
         if num_runs % 10000000 == 0 and num_runs != 0:
-            print("Number of contiguous districts found: {}\n".format(num_contiguous))
-            hours = (time.time() - start_time) / 60 / 60
-            print('Time ran: {:.2} hours\n'.format(hours))
-            print("Number of runs: {:,}\n".format(num_runs))
-            
+            print_update(num_runs, num_contiguous)
+
     write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)
     ratio_stats = get_ratio_stats(redistricting_stats, num_contiguous)
     paint_results(contiguous_grids, ratio_stats)
+
+def print_update(num_runs, num_contiguous):
+    print("Number of contiguous districts found: {}\n".format(num_contiguous))
+    hours = (time.time() - start_time) / 60 / 60
+    print('Time ran: {:.2} hours\n'.format(hours))
+    print("Number of runs: {:,}\n".format(num_runs))
 
 def populate_district_scheme(district_scheme, coordinates):
     """ Populates district_scheme with districts using coordinates """
