@@ -9,8 +9,7 @@ Purpose/Description:  25 voters (15 green and 10 purple party) are ramdomly spre
     This program provides randomly generates redistrictings, checks if the random redistricting is contiguous 
     and if it is will log statistics of the contiguous redistricting. Final statistics will be written to a file
     after the program is done running (i.e, which party won in what ratio). Ex. Green Won - 3, 2 and what percent 
-    of the total did each party win. Ex. Green Won 95% of the time. Results will also be able to be visualized in
-    a GUI.
+    of the total did each party win. Ex. Green Won 95% of the time. Results are also visualized in a GUI.
 
     25,000,000 runs take about 20 minutes. The amount of contiguous redistrictings found in that amount of time is random.
     Change NUM_RUNS to change how many time the program will run.
