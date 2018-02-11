@@ -4,7 +4,7 @@ from random import choice
 from getters import get_voter_parties
 
 def paint_results(grids, ratio_stats):
-    """ Displays redistring results in a tkinter GUI """
+    """ Displays redistricting results in a tkinter GUI """
 
     rv = Redistricting_Visualization(grids, ratio_stats)
 
