@@ -28,7 +28,7 @@ from getters import *
 
 start_time = time.time()
 TITLE_WIDTH = 70
-NUM_RUMS = 25000000
+NUM_RUNS = 25000000
 
 def main():
     district_scheme_visualization = '{}'.format(' District Schemes '.center(TITLE_WIDTH, '-'))
@@ -63,7 +63,7 @@ def main():
     num_contiguous += 1
 
     #Now loop
-    for _ in range(NUM_RUMS): 
+    for _ in range(NUM_RUNS): 
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
         start_coords = get_start_coords(district_coordinates)
@@ -91,13 +91,13 @@ def main():
             contiguous_grids.append(deepcopy(district_scheme))
 
         if NUM_RUNS % 10000000 == 0 and NUM_RUNS != 0:
-            print_update(NUM_RUNS, num_contiguous)
+            print_update(num_contiguous, NUM_RUNS)
 
     write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, NUM_RUNS)
     ratio_stats = get_ratio_stats(redistricting_stats, num_contiguous)
     paint_results(contiguous_grids, ratio_stats)
 
-def print_update(num_contiguous):
+def print_update(num_contiguous, NUM_RUNS):
     """ Prints an update to the console """
     print("Number of contiguous districts found: {}".format(num_contiguous))
     hours = (time.time() - start_time) / 60 / 60
@@ -184,7 +184,7 @@ def get_ratio_stats(redistricting_stats, num_contiguous):
     
     return ratio
 
-def write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous):
+def write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, NUM_RUNS):
     """ Writes redistricting stats to a file """ 
     out = '\n\n'
     out += '{}'.format(' General Stats '.center(TITLE_WIDTH, '-'))
