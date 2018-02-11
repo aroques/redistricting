@@ -53,11 +53,18 @@ def main():
         update_redistricting_stats(redistricting_stats, district_stats)
         num_contiguous = 1
 
-    contiguous_grids.append(get_another_district_scheme())
+    
+    district_scheme = get_another_district_scheme()
+    contiguous_grids.append(deepcopy(district_scheme))
+    print("Found a contiguous redistricting!")
+    district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
+    district_stats = get_district_stats(district_scheme, voter_parties)
+    update_redistricting_stats(redistricting_stats, district_stats)
+    num_contiguous += 1
 
     #Now loop
-    while num_contiguous < 2:
-    #for _ in range(2): 
+    #while num_contiguous < 2:
+    for _ in range(250000000): 
         num_runs += 1
         shuffle(district_coordinates)
         populate_district_scheme(district_scheme, district_coordinates)
@@ -85,7 +92,7 @@ def main():
             district_scheme_visualization += get_district_scheme_visualization(district_scheme, voter_parties)
             contiguous_grids.append(deepcopy(district_scheme))
 
-        if num_runs % 10000000 == 0 and num_runs != 0:
+        if num_runs % 25000000 == 0 and num_runs != 0:
             print_update(num_runs, num_contiguous)
 
     write_redistricting_stats(district_scheme_visualization, redistricting_stats, num_contiguous, num_runs)

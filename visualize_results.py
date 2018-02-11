@@ -144,12 +144,12 @@ class Grid:
         return color
 
     def show_grid(self, canvas):
-        Canvas_Helper.hide_canvas_items(False, canvas, self.rectangle_ids)
-        Canvas_Helper.hide_canvas_items(False, canvas, self.district_label_ids)
+        Canvas_Helper.hide_canvas_items(canvas, self.rectangle_ids, hide=False)
+        Canvas_Helper.hide_canvas_items(canvas, self.district_label_ids, hide=False)
 
     def hide_grid(self, canvas):
-        Canvas_Helper.hide_canvas_items(True, canvas, self.rectangle_ids)
-        Canvas_Helper.hide_canvas_items(True, canvas, self.district_label_ids)
+        Canvas_Helper.hide_canvas_items(canvas, self.rectangle_ids)
+        Canvas_Helper.hide_canvas_items(canvas, self.district_label_ids)
 
 class Pie_Chart:
     def __init__(self, root, canvas, ratio_stats):
@@ -213,12 +213,12 @@ class Pie_Chart:
         return 359.99 * pct
 
     def show_pie(self, canvas):
-        Canvas_Helper.hide_canvas_items(False, canvas, self.arc_ids)
-        Canvas_Helper.hide_canvas_items(False, canvas, self.label_ids)
+        Canvas_Helper.hide_canvas_items(canvas, self.arc_ids, hide=False)
+        Canvas_Helper.hide_canvas_items(canvas, self.label_ids, hide=False)
 
     def hide_pie(self, canvas):
-        Canvas_Helper.hide_canvas_items(True, canvas, self.arc_ids)
-        Canvas_Helper.hide_canvas_items(True, canvas, self.label_ids)
+        Canvas_Helper.hide_canvas_items(canvas, self.arc_ids)
+        Canvas_Helper.hide_canvas_items(canvas, self.label_ids)
 
 class Board:
     def __init__(self):
@@ -235,7 +235,7 @@ class Board:
 
 class Canvas_Helper:
     @staticmethod
-    def hide_canvas_items(hide, canvas, items):
+    def hide_canvas_items(canvas, items, hide=True):
         if hide:
             state = HIDDEN
         else:
